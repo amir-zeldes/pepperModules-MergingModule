@@ -176,6 +176,8 @@ public class Merger extends PepperManipulatorImpl implements PepperManipulator {
 				importOrder.put(graph, new ArrayList<SElementId>());
 			}
 
+			int maxSizeOfDocumentGroup = 0;
+
 			mappingTable = new Multimap();
 			// TODO add mapping properties to table
 			for (SCorpusGraph graph : getSaltProject().getSCorpusGraphs()) {
@@ -190,6 +192,8 @@ public class Merger extends PepperManipulatorImpl implements PepperManipulator {
 						// TODO check if sDocument.getSId() is contained in
 						// mapping properties
 						mappingTable.put(sDocument.getSId(), sDocument);
+						maxSizeOfDocumentGroup = Math.max(maxSizeOfDocumentGroup,
+							mappingTable.get(sDocument.getSId()).size());
 					}
 				}
 			}
@@ -213,7 +217,26 @@ public class Merger extends PepperManipulatorImpl implements PepperManipulator {
 					}
 				}
 			}
-		}
+
+			if (maxSizeOfDocumentGroup >= getModuleController().getJob().getMaxNumberOfDocuments()) {
+				/* 
+				 The configuration for the maximum number of documents in memory is 
+				 too small. If not changed it will result in a dead-lock in the code 
+				 as soon as a group of documents is merged which is larger or equal than 
+				 the maximal allowed number of documents. "Equal" because the number
+				 of documents in memory will be always size(group) + 1 (the new document
+				 which is created must be acccounted as well).
+        
+				 While changing the configuration in code is conflicting with the intention
+				 of the user to limit the memory used, a dead-lock would be even worse.
+				 */
+				logger.warn("Maximal number of documents which can be hold in memory "
+					+ "is not sufficient for the merging module and must be increased.");
+				getModuleController().getJob().setMaxNumberOfDocuments(
+					maxSizeOfDocumentGroup+1);
+			}
+      
+		} // end if mapping table is null
 	}
 
 	/**
