@@ -179,36 +179,38 @@ public class Merger extends BaseManipulator implements PepperManipulator {
 	 */
 	@Override
 	protected final void enhanceBaseCorpusStructure() {
-		Set<String> keys = mappingTable.keySet();
-		if ((keys != null) && (keys.size() > 0)) {
-			for (String key : keys) {
-				List<SNode> slot = mappingTable.get(key);
-				boolean noBase = true;
-				boolean isDoc = true;
-				for (SNode node : slot) {
-					if (node != null) {
-						if (node instanceof SCorpus) {
-							isDoc = false;
-							if (((SCorpus) node).getSCorpusGraph().equals(getBaseCorpusStructure())) {
-								noBase = false;
-								break;
-							}
-						} else if (node instanceof SDocument) {
-							isDoc = true;
-							if (((SDocument) node).getSCorpusGraph().equals(getBaseCorpusStructure())) {
-								noBase = false;
-								break;
+		if(mappingTable != null) {
+			Set<String> keys = mappingTable.keySet();
+			if ((keys != null) && (keys.size() > 0)) {
+				for (String key : keys) {
+					List<SNode> slot = mappingTable.get(key);
+					boolean noBase = true;
+					boolean isDoc = true;
+					for (SNode node : slot) {
+						if (node != null) {
+							if (node instanceof SCorpus) {
+								isDoc = false;
+								if (((SCorpus) node).getSCorpusGraph().equals(getBaseCorpusStructure())) {
+									noBase = false;
+									break;
+								}
+							} else if (node instanceof SDocument) {
+								isDoc = true;
+								if (((SDocument) node).getSCorpusGraph().equals(getBaseCorpusStructure())) {
+									noBase = false;
+									break;
+								}
 							}
 						}
 					}
-				}
-				if (noBase) {
-					if (isDoc) {
-						getBaseCorpusStructure().createSCorpus(URI.createURI(key).trimSegments(1));
-						SDocument doc= getBaseCorpusStructure().createSDocument(URI.createURI(key));
-						doc.setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());
-					} else {
-						getBaseCorpusStructure().createSCorpus(URI.createURI(key));
+					if (noBase) {
+						if (isDoc) {
+							getBaseCorpusStructure().createSCorpus(URI.createURI(key).trimSegments(1));
+							SDocument doc= getBaseCorpusStructure().createSDocument(URI.createURI(key));
+							doc.setSDocumentGraph(SaltFactory.eINSTANCE.createSDocumentGraph());
+						} else {
+							getBaseCorpusStructure().createSCorpus(URI.createURI(key));
+						}
 					}
 				}
 			}
