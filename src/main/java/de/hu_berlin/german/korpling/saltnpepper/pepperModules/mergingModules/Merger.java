@@ -41,7 +41,6 @@ import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperManipulator
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapper;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapperController;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperManipulatorImpl;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -58,7 +57,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
  * 
  */
 @Component(name = "MergerComponent", factory = "PepperManipulatorComponentFactory")
-public class Merger extends PepperManipulatorImpl implements PepperManipulator {
+public class Merger extends BaseManipulator implements PepperManipulator {
 	public static final String MODULE_NAME="Merger";
 	
 	private static final Logger logger = LoggerFactory.getLogger(MODULE_NAME);
