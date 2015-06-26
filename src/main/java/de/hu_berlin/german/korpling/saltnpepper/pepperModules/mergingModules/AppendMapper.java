@@ -27,6 +27,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import org.eclipse.emf.common.util.EList;
@@ -87,23 +88,30 @@ public class AppendMapper extends BaseMapper implements PepperMapper {
 					if (itSubjects.hasPrevious()) {
 						// copy all nodes from the other document graphs to the first one
 
+						List<SRelation> originalRelations
+							= new LinkedList<>(doc.getSDocumentGraph().
+								getSRelations());
+						
 						for (SNode n : new LinkedList<>(doc.getSDocumentGraph().getSNodes())) {
 							if (!(n instanceof STextualDS)) {
+								doc.getSDocumentGraph().removeNode(n);
 								baseGraph.addSNode(n);
 							}
 						}
 
-						for (SRelation rel : new LinkedList<>(doc.getSDocumentGraph().
-							getSRelations())) {
+						for (SRelation rel : originalRelations) {
 							if (rel instanceof STextualRelation) {
 								STextualRelation textRel = (STextualRelation) rel;
+								// only move the first textual relation
 								if (textRel.getSTextualDS() == firstText) {
-									// only move the first textual relation
-									baseGraph.addSRelation(textRel);
+									
 									// reset the actual text and the start and end
 									textRel.setSTextualDS(baseText);
 									textRel.setSStart(offset + textRel.getSStart());
 									textRel.setSEnd(offset + textRel.getSEnd());
+									
+									baseGraph.addSRelation(textRel);
+									
 								}
 							} else {
 								// move all other relations
