@@ -18,15 +18,10 @@
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.mergingModules;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Vector;
 
 import org.eclipse.emf.common.util.URI;
 import org.osgi.service.component.annotations.Component;
@@ -34,12 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.common.DOCUMENT_STATUS;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.exceptions.PepperFWException;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.DocumentController;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.MappingSubject;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperManipulator;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapper;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapperController;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;

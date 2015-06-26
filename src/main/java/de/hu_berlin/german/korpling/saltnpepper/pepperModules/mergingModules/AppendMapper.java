@@ -44,7 +44,7 @@ public class AppendMapper extends BaseMapper implements PepperMapper {
 
 	@Override
 	public DOCUMENT_STATUS mapSDocument() {
-
+		
 		// only do something if there are at least two documents that need to be merged
 		if (getMappingSubjects().size() > 1) {
 			MappingSubject baseSubject = getMappingSubjects().get(0);
