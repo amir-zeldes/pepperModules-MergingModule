@@ -234,6 +234,27 @@ public class Merger extends BaseManipulator implements PepperManipulator {
 	public BaseMapper newMapperInstance() {
 		return new MergerMapper();
 	}
+
+	/**
+	 * Removes all corpus-structures except the base corpus-structure
+	 */
+	@Override
+	public void end() throws PepperModuleException {
+		List<SCorpusGraph> removeCorpusStructures = new ArrayList<SCorpusGraph>();
+		for (SCorpusGraph graph : getSaltProject().getSCorpusGraphs()) {
+			if (graph != getBaseCorpusStructure()) {
+				removeCorpusStructures.add(graph);
+			}
+		}
+		if (removeCorpusStructures.size() > 0) {
+			for (SCorpusGraph graph : removeCorpusStructures) {
+				getSaltProject().getSCorpusGraphs().remove(graph);
+			}
+		}
+		if (removeCorpusStructures.size() != 1) {
+			logger.warn("Could not remove all corpus-structures from salt project which are not the base corpus-structure. Left structures are: '" + removeCorpusStructures + "'. ");
+		}
+	}
 	
 	
 }
