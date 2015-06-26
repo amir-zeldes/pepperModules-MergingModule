@@ -16,6 +16,9 @@
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.mergingModules;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperManipulator;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapper;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 import org.osgi.service.component.annotations.Component;
 
 /**
@@ -29,4 +32,18 @@ public class Appender extends BaseManipulator implements PepperManipulator {
     public Appender() {
         setName("Appender");
     }
+
+	@Override
+	public PepperMapper createPepperMapper(SElementId sElementId) {
+		
+		if(sElementId.getSIdentifiableElement() instanceof SDocument) {
+			AppendMapper mapper = new AppendMapper();
+			// TODO: configure mapper
+			return mapper;
+		} else {	
+			return super.createPepperMapper(sElementId);
+		}
+	}
+	
+	
 }
