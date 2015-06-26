@@ -79,7 +79,7 @@ public class Merger extends BaseManipulator implements PepperManipulator {
 	 * a map containing all mapping partners ({@link SCorpus} and
 	 * {@link SDocument} nodes) corresponding to their sId.
 	 **/
-	protected Multimap mappingTable = null;
+	protected SNodeByIDStorage mappingTable = null;
 
 	/**
 	 * similar to guavas multimap, but can contain values twice (this is
@@ -87,10 +87,10 @@ public class Merger extends BaseManipulator implements PepperManipulator {
 	 * belong to different {@link SCorpusGraph}s are the same for equals(), but
 	 * shouldn't be.)
 	 **/
-	class Multimap {
+	class SNodeByIDStorage {
 		private Map<String, List<SNode>> map = null;
 
-		public Multimap() {
+		public SNodeByIDStorage() {
 			map = new HashMap<String, List<SNode>>();
 		}
 
@@ -161,7 +161,7 @@ public class Merger extends BaseManipulator implements PepperManipulator {
 	}
 
 	/**
-	 * Creates a table of type {@link Multimap}, which contains a slot of
+	 * Creates a table of type {@link SNodeByIDStorage}, which contains a slot of
 	 * matching elements as value. The key is the {@link SElementId}. Only real
 	 * existing elements are contained in table.
 	 */
@@ -175,7 +175,7 @@ public class Merger extends BaseManipulator implements PepperManipulator {
 				importOrder.put(graph, new ArrayList<SElementId>());
 			}
 
-			mappingTable = new Multimap();
+			mappingTable = new SNodeByIDStorage();
 			// TODO add mapping properties to table
 			for (SCorpusGraph graph : getSaltProject().getSCorpusGraphs()) {
 				if (graph.getSCorpora().size() != 0) {
