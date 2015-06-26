@@ -114,7 +114,7 @@ public class AppendMapper extends BaseMapper implements PepperMapper {
 									
 								}
 							} else {
-								// move all other relations
+								// just move all other relations
 								baseGraph.addSRelation(rel);
 							}
 						}
@@ -127,6 +127,7 @@ public class AppendMapper extends BaseMapper implements PepperMapper {
 				baseText.setSText(appendedText.toString());
 			}
 			
+			
 			// delete all other documents
 			ListIterator<MappingSubject> itRemaining = getMappingSubjects().
 				listIterator(1);
@@ -134,7 +135,8 @@ public class AppendMapper extends BaseMapper implements PepperMapper {
 				MappingSubject s = itRemaining.next();
 				s.setMappingResult(DOCUMENT_STATUS.DELETED);
 			}
-		}
+			
+		} // end if more than one mapping subjects
 
 		return DOCUMENT_STATUS.COMPLETED;
 	}
