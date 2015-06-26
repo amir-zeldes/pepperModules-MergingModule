@@ -41,6 +41,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SElementId;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotatableElement;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.util.LinkedList;
+import java.util.Vector;
 
 /**
  * 
@@ -122,6 +124,25 @@ public class Merger extends BaseManipulator implements PepperManipulator {
 			}
 		}
 	}
+
+	@Override
+	protected List<SNode> getMappableSlot(SElementId sElementId) {
+		return mappingTable.get(sElementId.getSId());
+	}
+	
+	
+
+	@Override
+	protected List<SElementId> getOrCreateGivenSlot(SElementId sElementId) {
+		List<SElementId> givenSlot = givenSlots.get(sElementId.getSId());
+		if (givenSlot == null) {
+			givenSlot = new Vector<>();
+			givenSlots.put(sElementId.getSId(), givenSlot);
+		}
+		return givenSlot;
+	}
+
+	
 
 	/**
 	 * Moves all {@link SMetaAnnotation}s from <em>source</em> object to passed
@@ -229,69 +250,11 @@ public class Merger extends BaseManipulator implements PepperManipulator {
 			logger.warn("Could not remove all corpus-structures from salt project which are not the base corpus-structure. Left structures are: '"+removeCorpusStructures+"'. ");
 		}
 	}
-	
-	/**
-	 * Creates a {@link PepperMapper} of type {@link MergerMapper}. Therefore
-	 * the table {@link #givenSlots} must contain an entry for the given
-	 * {@link SElementId}. The create methods passes all documents and corpora
-	 * given in the entire slot to the {@link MergerMapper}.
-	 **/
+
 	@Override
-	public PepperMapper createPepperMapper(SElementId sElementId) {
-		MergerMapper mapper = new MergerMapper();
-		if (sElementId.getSIdentifiableElement() instanceof SDocument) {
-			if ((givenSlots == null) || (givenSlots.size() == 0)) {
-				throw new PepperModuleException(this, "This should not have been happend and seems to be a bug of module. The problem is, that 'givenSlots' is null or empty in method 'createPepperMapper()'");
-			}
-			List<SElementId> givenSlot = givenSlots.get(sElementId.getSId());
-			if (givenSlot == null) {
-				throw new PepperModuleException(this, "This should not have been happend and seems to be a bug of module. The problem is, that a 'givenSlot' in 'givenSlots' is null or empty in method 'createPepperMapper()'. The sElementId '" + sElementId + "' was not contained in list: " + givenSlots);
-			}
-			boolean noBase = true;
-			for (SElementId id : givenSlot) {
-				MappingSubject mappingSubject = new MappingSubject();
-				mappingSubject.setSElementId(id);
-				mappingSubject.setMappingResult(DOCUMENT_STATUS.IN_PROGRESS);
-				mapper.getMappingSubjects().add(mappingSubject);
-				if (getBaseCorpusStructure()== (((SDocument) id.getSIdentifiableElement()).getSCorpusGraph())) {
-					noBase = false;
-				}
-			}
-			if (noBase) {// no corpus in slot containing in base
-							// corpus-structure was found
-				MappingSubject mappingSubject = new MappingSubject();
-				SNode baseSNode = getBaseCorpusStructure().getSNode(sElementId.getSId());
-				if (baseSNode == null) {
-					throw new PepperModuleException(this, "Cannot create a mapper for '" + SaltFactory.eINSTANCE.getGlobalId(sElementId) + "', since no base SNode was found. ");
-				}
-				mappingSubject.setSElementId(baseSNode.getSElementId());
-				mappingSubject.setMappingResult(DOCUMENT_STATUS.IN_PROGRESS);
-				mapper.getMappingSubjects().add(mappingSubject);
-			}
-		} else if (sElementId.getSIdentifiableElement() instanceof SCorpus) {
-			List<SNode> givenSlot = mappingTable.get(sElementId.getSId());
-			if (givenSlot == null) {
-				throw new PepperModuleException(this, "This should not have been happend and seems to be a bug of module. The problem is, that a 'givenSlot' in 'givenSlots' is null or empty in method 'createPepperMapper()'. The sElementId '" + sElementId + "' was not contained in list: " + givenSlots);
-			}
-			boolean noBase = true;
-			for (SNode sCorpus : givenSlot) {
-				MappingSubject mappingSubject = new MappingSubject();
-				mappingSubject.setSElementId(sCorpus.getSElementId());
-				mappingSubject.setMappingResult(DOCUMENT_STATUS.IN_PROGRESS);
-				mapper.getMappingSubjects().add(mappingSubject);
-				if (getBaseCorpusStructure().equals(((SCorpus) sCorpus).getSCorpusGraph())) {
-					noBase = false;
-				}
-			}
-			if (noBase) {// no corpus in slot containing in base
-							// corpus-structure was found
-				MappingSubject mappingSubject = new MappingSubject();
-				mappingSubject.setSElementId(getBaseCorpusStructure().getSNode(sElementId.getSId()).getSElementId());
-				mappingSubject.setMappingResult(DOCUMENT_STATUS.IN_PROGRESS);
-				mapper.getMappingSubjects().add(mappingSubject);
-			}
-		}
-		mapper.setBaseCorpusStructure(getBaseCorpusStructure());
-		return (mapper);
+	public BaseMapper newMapperInstance() {
+		return new MergerMapper();
 	}
+	
+	
 }

@@ -118,7 +118,7 @@ public class AppendMapper extends BaseMapper implements PepperMapper {
 			if (baseText != null) {
 				baseText.setSText(appendedText.toString());
 			}
-
+			
 			// delete all other documents
 			ListIterator<MappingSubject> itRemaining = getMappingSubjects().
 				listIterator(1);

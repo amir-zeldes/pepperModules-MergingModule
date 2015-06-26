@@ -65,33 +65,6 @@ public class MergerMapper extends BaseMapper implements PepperMapper {
 	private static final Logger logger = LoggerFactory.getLogger(Merger.MODULE_NAME);
 
 	protected boolean isTestMode = false;
-
-	/**
-	 * Determines which {@link SCorpusGraph} is the base corpus graph, in which
-	 * everything has to be merged in.
-	 **/
-	private SCorpusGraph baseCorpusStructure = null;
-
-	/**
-	 * Returns the {@link SCorpusGraph} is the base corpus graph, in which
-	 * everything has to be merged in.
-	 * 
-	 * @return
-	 */
-	public SCorpusGraph getBaseCorpusStructure() {
-		return baseCorpusStructure;
-	}
-
-	/**
-	 * Sets the {@link SCorpusGraph} is the base corpus graph, in which
-	 * everything has to be merged in.
-	 * 
-	 * @param baseCorpusStructure
-	 */
-	public void setBaseCorpusStructure(SCorpusGraph baseCorpusStructure) {
-		this.baseCorpusStructure = baseCorpusStructure;
-	}
-
 	/**
 	 * This method initializes the mapping.
 	 */

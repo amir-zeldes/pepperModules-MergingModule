@@ -16,6 +16,7 @@
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.mergingModules;
 
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperMapperImpl;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 
 /**
  *
@@ -23,5 +24,30 @@ import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperMapper
  */
 public abstract class BaseMapper extends PepperMapperImpl
 {
+	/**
+	 * Determines which {@link SCorpusGraph} is the base corpus graph, in which
+	 * everything has to be merged in.
+	 **/
+	protected SCorpusGraph baseCorpusStructure = null;
+
+	/**
+	 * Returns the {@link SCorpusGraph} is the base corpus graph, in which
+	 * everything has to be merged in.
+	 *
+	 * @return
+	 */
+	public SCorpusGraph getBaseCorpusStructure() {
+		return baseCorpusStructure;
+	}
+
+	/**
+	 * Sets the {@link SCorpusGraph} is the base corpus graph, in which
+	 * everything has to be merged in.
+	 *
+	 * @param baseCorpusStructure
+	 */
+	public void setBaseCorpusStructure(SCorpusGraph baseCorpusStructure) {
+		this.baseCorpusStructure = baseCorpusStructure;
+	}
   
 }

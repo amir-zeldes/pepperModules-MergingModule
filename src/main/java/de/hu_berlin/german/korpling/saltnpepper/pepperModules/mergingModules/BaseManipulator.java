@@ -15,8 +15,11 @@
  */
 package de.hu_berlin.german.korpling.saltnpepper.pepperModules.mergingModules;
 
+import de.hu_berlin.german.korpling.saltnpepper.pepper.common.DOCUMENT_STATUS;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.exceptions.PepperFWException;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.DocumentController;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.MappingSubject;
+import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapper;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapperController;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.impl.PepperManipulatorImpl;
@@ -132,12 +135,8 @@ public abstract class BaseManipulator extends PepperManipulatorImpl {
 			}
 			sElementId = documentController.getsDocumentId();
 			getDocumentId2DC().put(SaltFactory.eINSTANCE.getGlobalId(sElementId), documentController);
-			List<SNode> mappableSlot = mappingTable.get(sElementId.getSId());
-			List<SElementId> givenSlot = givenSlots.get(sElementId.getSId());
-			if (givenSlot == null) {
-				givenSlot = new Vector<SElementId>();
-				givenSlots.put(sElementId.getSId(), givenSlot);
-			}
+			List<SNode> mappableSlot = getMappableSlot(sElementId);
+			List<SElementId> givenSlot = getOrCreateGivenSlot(sElementId);
 			givenSlot.add(sElementId);
 			logger.trace("[Merger] New document has arrived {}. ", SaltFactory.eINSTANCE.getGlobalId(sElementId));
 			documentsToMerge.add(SaltFactory.eINSTANCE.getGlobalId(sElementId));
@@ -216,6 +215,9 @@ public abstract class BaseManipulator extends PepperManipulatorImpl {
 			}
 		}
 	}
+	
+	protected abstract List<SNode> getMappableSlot(SElementId sElementId);
+	protected abstract List<SElementId> getOrCreateGivenSlot(SElementId sElementId);
 
 	/**
 	 * Returns the {@link SCorpusGraph} is the base corpus graph, in which
@@ -236,6 +238,77 @@ public abstract class BaseManipulator extends PepperManipulatorImpl {
 	public void setBaseCorpusStructure(SCorpusGraph baseCorpusStructure) {
 		this.baseCorpusStructure = baseCorpusStructure;
 	}
+
+	/**
+	 * Creates a {@link PepperMapper} of type {@link MergerMapper}. Therefore
+	 * the table {@link #givenSlots} must contain an entry for the given
+	 * {@link SElementId}. The create methods passes all documents and corpora
+	 * given in the entire slot to the {@link MergerMapper}.
+	 * @param sElementId
+	 * @return 
+	 **/
+	@Override
+	public PepperMapper createPepperMapper(SElementId sElementId) {
+		BaseMapper mapper = newMapperInstance();
+		if (sElementId.getSIdentifiableElement() instanceof SDocument) {
+			if ((givenSlots == null) || (givenSlots.size() == 0)) {
+				throw new PepperModuleException(this, "This should not have been happend and seems to be a bug of module. The problem is, that 'givenSlots' is null or empty in method 'createPepperMapper()'");
+			}
+			List<SElementId> givenSlot = getOrCreateGivenSlot(sElementId);
+			if (givenSlot == null) {
+				throw new PepperModuleException(this, "This should not have been happend and seems to be a bug of module. The problem is, that a 'givenSlot' in 'givenSlots' is null or empty in method 'createPepperMapper()'. The sElementId '" + sElementId + "' was not contained in list: " + givenSlots);
+			}
+			boolean noBase = true;
+			for (SElementId id : givenSlot) {
+				MappingSubject mappingSubject = new MappingSubject();
+				mappingSubject.setSElementId(id);
+				mappingSubject.setMappingResult(DOCUMENT_STATUS.IN_PROGRESS);
+				mapper.getMappingSubjects().add(mappingSubject);
+				if (getBaseCorpusStructure() == (((SDocument) id.getSIdentifiableElement()).getSCorpusGraph())) {
+					noBase = false;
+				}
+			}
+			if (noBase) {
+				// no corpus in slot containing in base
+				// corpus-structure was found
+				MappingSubject mappingSubject = new MappingSubject();
+				SNode baseSNode = getBaseCorpusStructure().getSNode(sElementId.getSId());
+				if (baseSNode == null) {
+					throw new PepperModuleException(this, "Cannot create a mapper for '" + SaltFactory.eINSTANCE.getGlobalId(sElementId) + "', since no base SNode was found. ");
+				}
+				mappingSubject.setSElementId(baseSNode.getSElementId());
+				mappingSubject.setMappingResult(DOCUMENT_STATUS.IN_PROGRESS);
+				mapper.getMappingSubjects().add(mappingSubject);
+			}
+		} else if (sElementId.getSIdentifiableElement() instanceof SCorpus) {
+			List<SNode> givenSlot = mappingTable.get(sElementId.getSId());
+			if (givenSlot == null) {
+				throw new PepperModuleException(this, "This should not have been happend and seems to be a bug of module. The problem is, that a 'givenSlot' in 'givenSlots' is null or empty in method 'createPepperMapper()'. The sElementId '" + sElementId + "' was not contained in list: " + givenSlots);
+			}
+			boolean noBase = true;
+			for (SNode sCorpus : givenSlot) {
+				MappingSubject mappingSubject = new MappingSubject();
+				mappingSubject.setSElementId(sCorpus.getSElementId());
+				mappingSubject.setMappingResult(DOCUMENT_STATUS.IN_PROGRESS);
+				mapper.getMappingSubjects().add(mappingSubject);
+				if (getBaseCorpusStructure().equals(((SCorpus) sCorpus).getSCorpusGraph())) {
+					noBase = false;
+				}
+			}
+			if (noBase) {
+				// no corpus in slot containing in base
+				// corpus-structure was found
+				MappingSubject mappingSubject = new MappingSubject();
+				mappingSubject.setSElementId(getBaseCorpusStructure().getSNode(sElementId.getSId()).getSElementId());
+				mappingSubject.setMappingResult(DOCUMENT_STATUS.IN_PROGRESS);
+				mapper.getMappingSubjects().add(mappingSubject);
+			}
+		}
+		mapper.setBaseCorpusStructure(getBaseCorpusStructure());
+		return mapper;
+	}
+	
+	public abstract BaseMapper newMapperInstance();
 	
 	/**
 	 * similar to guavas multimap, but can contain values twice (this is
