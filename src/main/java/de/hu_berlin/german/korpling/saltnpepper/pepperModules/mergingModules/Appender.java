@@ -44,6 +44,10 @@ public class Appender extends BaseManipulator implements PepperManipulator {
 			return super.createPepperMapper(sElementId);
 		}
 	}
+
+	@Override
+	protected void enhanceBaseCorpusStructure() {
+	}
 	
 	
 }
