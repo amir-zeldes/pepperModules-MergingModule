@@ -138,6 +138,15 @@ public class Appender extends BaseManipulator implements PepperManipulator {
 					mappingTable.put(doc.getSId(), doc);
 				}
 			}
+			
+			if (mappingTable.getMaxSlotSize() >= getModuleController().getJob().getMaxNumberOfDocuments()) {
+				logger.error("Maximal number of documents which can be hold in "
+					+ "memory (configuration value \"pepper.maxAmountOfProcessedSDocuments\") "
+					+ "is not sufficient for the merging module and must be increased "
+					+ "from {} to {}.", 
+					 getModuleController().getJob().getMaxNumberOfDocuments(),
+					 mappingTable.getMaxSlotSize()+1);
+			}
 
 		}
 

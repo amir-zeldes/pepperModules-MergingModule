@@ -319,6 +319,8 @@ public abstract class BaseManipulator extends PepperManipulatorImpl {
 	 **/
 	public static class SNodeByIDStorage {
 		private Map<String, List<SNode>> map = null;
+		
+		private int maxSlotSize = 0;
 
 		public SNodeByIDStorage() {
 			map = new HashMap<String, List<SNode>>();
@@ -331,6 +333,8 @@ public abstract class BaseManipulator extends PepperManipulatorImpl {
 				map.put(sId, slot);
 			}
 			slot.add(sNode);
+			maxSlotSize = Math.max(maxSlotSize, 
+				slot.size());
 		}
 
 		public List<SNode> get(String sId) {
@@ -362,6 +366,12 @@ public abstract class BaseManipulator extends PepperManipulatorImpl {
 		public Set<String> keySet() {
 			return (map.keySet());
 		}
+
+		public int getMaxSlotSize() {
+			return maxSlotSize;
+		}
+		
+		
 	}
   
 }
