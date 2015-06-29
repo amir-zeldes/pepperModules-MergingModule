@@ -112,7 +112,7 @@ public class Appender extends BaseManipulator implements PepperManipulator {
 									+ "one and deletes all others.", sourceDocName);
 							} else if (sourceDocList.isEmpty()) {
 								logger.warn("No document found with name {}, "
-									+ "the configuration will be ignored", sourceDocName);
+									+ "this specific configuration will be ignored", sourceDocName);
 								continue;
 							}
 
