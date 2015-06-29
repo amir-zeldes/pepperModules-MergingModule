@@ -85,7 +85,7 @@ public class AppendMapper extends BaseMapper implements PepperMapper {
 						appendedText.append("\n");
 					}
 
-					if (itSubjects.hasPrevious()) {
+					if (baseText != firstText) {
 						// copy all nodes from the other document graphs to the first one
 
 						List<SRelation> originalRelations
@@ -95,6 +95,11 @@ public class AppendMapper extends BaseMapper implements PepperMapper {
 						for (SNode n : new LinkedList<>(doc.getSDocumentGraph().getSNodes())) {
 							if (!(n instanceof STextualDS)) {
 								doc.getSDocumentGraph().removeNode(n);
+								/* FIXME: if not set to null the ID is not 
+								 updated when it is added to the graph again, 
+								 there must be another way
+								 */
+								n.setSId(null);
 								baseGraph.addSNode(n);
 							}
 						}
