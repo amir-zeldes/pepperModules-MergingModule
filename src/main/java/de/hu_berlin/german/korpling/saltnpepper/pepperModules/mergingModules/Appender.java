@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimaps;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperManipulator;
-import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.PepperMapper;
 import de.hu_berlin.german.korpling.saltnpepper.pepper.modules.exceptions.PepperModuleException;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -50,7 +49,7 @@ public class Appender extends BaseManipulator implements PepperManipulator {
 
 	private final static Logger logger = LoggerFactory.getLogger(Appender.class);
 
-	private final Map<String, String> targetDocRename = new LinkedHashMap<>();
+	private final Map<SDocument, String> targetDocRename = new LinkedHashMap<>();
 	
 	private final Map<SElementId, SElementId> source2TargetDoc = new HashMap<>();
 
@@ -122,7 +121,7 @@ public class Appender extends BaseManipulator implements PepperManipulator {
 							if (targDocument == null) {
 								// the first document in the list is always the target document
 								targDocument = sourceDoc;
-								targetDocRename.put(sourceDocName, targetDocName);
+								targetDocRename.put(sourceDoc, targetDocName);
 							}
 							mappingTable.put(targDocument.getSId(), sourceDoc);
 							source2TargetDoc.put(sourceDoc.getSElementId(), targDocument.getSElementId());
@@ -144,6 +143,17 @@ public class Appender extends BaseManipulator implements PepperManipulator {
 
 		return result;
 	}
+
+	@Override
+	public void end() throws PepperModuleException {
+		// apply re-naming
+		for(Map.Entry<SDocument, String> e : targetDocRename.entrySet()) {
+			e.getKey().setSName(e.getValue());
+		}
+		super.end();
+	}
+	
+	
 
 	@Override
 	protected void enhanceBaseCorpusStructure() {
